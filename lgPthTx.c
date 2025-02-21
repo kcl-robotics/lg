@@ -31,6 +31,10 @@ For more information, please refer to <http://unlicense.org/>
 #include "lgHdl.h"
 #include "lgPthTx.h"
 
+// set SLEEP_MODE to 0 for the original pulse control with absolute sleep
+//                   1 for the modified pulse control with relative sleep
+#define SLEEP_MODE   1
+
 int lgMinTxDelay = 10;
 
 static pthread_t pthTx;
@@ -176,11 +180,18 @@ void *lgPthTx(void)
       }
 
       lgPthTxUnlock();
-
+#if SLEEP_MODE == 0
       // sleep until next edge
-
+      // original absolute sleep
       while (clock_nanosleep(
          CLOCK_MONOTONIC, TIMER_ABSTIME, &pthTxReq, NULL));
+#else
+      // modified relative sleep
+      struct timespec req, rem;
+      req.tv_sec = pthTxDelayMicros / 1000000;
+      req.tv_nsec = (pthTxDelayMicros % 1000000) * 1000;
+      while (clock_nanosleep(CLOCK_MONOTONIC, 0, &req, &rem)) req = rem;
+#endif
    }
 
    pthTxRunning = LG_THREAD_NONE;
@@ -316,4 +327,3 @@ lgTxRec_p lgGroupCreateWaveRec(
 
    return p;
 }
-
