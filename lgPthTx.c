@@ -204,19 +204,20 @@ void *lgPthTx(void)
       }
       lgPthTxUnlock();
       struct timespec now, stop;
-      clock_gettime(CLOCK_MONOTONIC, &now);
-      stop = now;
-      stop.tv_nsec = now.tv_nsec + (pthTxDelayMicros * 1000);
+      clock_gettime(CLOCK_MONOTONIC, &stop);
+      stop.tv_nsec = stop.tv_nsec + ((pthTxDelayMicros * 1000) % 1000000000);
+      stop.tv_sec = stop.tv_sec + (pthTxDelayMicros / 1000000);
       if (stop.tv_nsec >= 1000000000)
       {
          stop.tv_sec += 1;
          stop.tv_nsec -= 1000000000;
       }
-      while ((now.tv_sec==stop.tv_sec && now.tv_nsec<stop.tv_nsec) ||
-             (now.tv_sec<stop.tv_sec))
+      do
       {
          clock_gettime(CLOCK_MONOTONIC, &now);
       }
+      while ((now.tv_sec == stop.tv_sec && now.tv_nsec < stop.tv_nsec) ||
+             (now.tv_sec < stop.tv_sec));
 #endif
    }
 
