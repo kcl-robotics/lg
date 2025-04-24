@@ -1,5 +1,34 @@
+# Custom modify lgpio for ODI MLC
 
 lgpio is a library for Linux Single Board Computers (SBC) which allows control of the General Purpose Input Outputs (GPIO).
+
+## Download & Install
+
+### Prerequisites
+
+**MLC software should be installed before lgpio.**
+
+A few packages are needed during installation of the Python modules.
+
+* the SWIG code generator (to build lgpio.py from the C library)
+* the Python development files (to build lgpio.py)
+* the Python set up tools (to install lgpio.py and rgpio.py)
+
+On Debian like systems these packages may be installed with the following commands.
+
+- `sudo apt install swig python3-dev`
+- `sudo apt install python3-setuptools`
+- `echo "alias makelg='cd ~/lg; make; sudo make install; cp /usr/local/lib/python3.11/dist-packages/lgpio-0.2.2.0-py3.11-linux-aarch64.egg/_lgpio.cpython-311-aarch64-linux-gnu.so /home/user/ODI-MLC/venv/lib/python3.11/site-packages; cd ~/ODI-MLC'" >> ~/.bashrc`
+
+
+### Download & Install
+
+- `git clone git@github.com:kcl-robotics/lg.git`
+- `makelg`
+
+## GPIO
+
+ALL GPIO are identified by their gpiochip line number.
 
 ## Features
 
@@ -45,37 +74,3 @@ See http://abyz.me.uk/lg/
 
 See http://abyz.me.uk/lg/examples.html and the examples in the
 EXAMPLES directory.
-
-## GPIO
-
-ALL GPIO are identified by their gpiochip line number.
-
-## Download & Install
-
-### Prerequisites
-
-A few packages are needed during installation of the Python modules.
-
-* the SWIG code generator (to build lgpio.py from the C library)
-* the Python development files (to build lgpio.py)
-* the Python set up tools (to install lgpio.py and rgpio.py)
-
-On Debian like systems these packages may be installed with the following commands.
-
-```
-sudo apt install swig python3-dev
-sudo apt install python3-setuptools
-
-```
-
-### Download & Install
-
-```
-wget https://github.com/joan2937/lg/archive/master.zip
-unzip master.zip
-cd lg-master
-make
-sudo make install
-
-```
-
