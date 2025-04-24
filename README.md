@@ -63,8 +63,8 @@ A few packages are needed during installation of the Python modules.
 On Debian like systems these packages may be installed with the following commands.
 
 ```
-sudo apt install swig python-dev python3-dev
-sudo apt install python-setuptools python3-setuptools
+sudo apt install swig python3-dev
+sudo apt install python3-setuptools
 
 ```
 
