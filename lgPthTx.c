@@ -31,10 +31,6 @@ For more information, please refer to <http://unlicense.org/>
 #include "lgHdl.h"
 #include "lgPthTx.h"
 
-// set SLEEP_MODE to 0 for the original pulse control with absolute sleep
-//                   1 for the modified pulse control with relative sleep (offset ignored)
-//                   2 for the modified pulse control with relative busy delay
-#define SLEEP_MODE   2
 
 int lgMinTxDelay = 10;
 
@@ -42,7 +38,7 @@ static pthread_t pthTx;
 static pthread_mutex_t lgTxMutex = PTHREAD_MUTEX_INITIALIZER;
 static volatile lgTxRec_p txRec = NULL;
 static int pthTxRunning = LG_THREAD_NONE;
-static struct timespec pthTxReq;
+static struct timespec pthTxReq, now;
 static int pthTxDelayMicros = 0;
 
 void *lgPthTx(void)
@@ -173,7 +169,6 @@ void *lgPthTx(void)
          if (p) p = p->next;
       }
 
-#if SLEEP_MODE == 0
       pthTxReq.tv_nsec += (pthTxDelayMicros * 1000);
       if (pthTxReq.tv_nsec >= 1000000000)
       {
@@ -181,44 +176,24 @@ void *lgPthTx(void)
          pthTxReq.tv_nsec -= 1000000000;
       }
 
-      lgPthTxUnlock();
-
-      // sleep until next edge
-      // original absolute sleep
-      while (clock_nanosleep(
-         CLOCK_MONOTONIC, TIMER_ABSTIME, &pthTxReq, NULL));
-#elif SLEEP_MODE == 1
-      lgPthTxUnlock();
-      // modified relative sleep
-      struct timespec req, rem;
-      req.tv_sec = pthTxDelayMicros / 1000000;
-      req.tv_nsec = (pthTxDelayMicros * 1000) % 1000000000;
-      while (clock_nanosleep(CLOCK_MONOTONIC, 0, &req, &rem)) req = rem;
-      // while (clock_nanosleep(CLOCK_MONOTONIC, 0, &req, NULL));
-#elif SLEEP_MODE == 2
-      pthTxReq.tv_nsec += (pthTxDelayMicros * 1000);
-      if (pthTxReq.tv_nsec >= 1000000000)
+      if (txRec)
       {
-         pthTxReq.tv_sec += 1;
-         pthTxReq.tv_nsec -= 1000000000;
+         // unlock here for txRec
+         lgPthTxUnlock();
+         // busy wait until next edge
+         do
+            clock_gettime(CLOCK_MONOTONIC, &now);
+         while ((now.tv_sec == pthTxReq.tv_sec && now.tv_nsec < pthTxReq.tv_nsec) ||
+               (now.tv_sec < pthTxReq.tv_sec));
       }
-      lgPthTxUnlock();
-      struct timespec now, stop;
-      clock_gettime(CLOCK_MONOTONIC, &stop);
-      stop.tv_nsec = stop.tv_nsec + ((pthTxDelayMicros * 1000) % 1000000000);
-      stop.tv_sec = stop.tv_sec + (pthTxDelayMicros / 1000000);
-      if (stop.tv_nsec >= 1000000000)
+      else
       {
-         stop.tv_sec += 1;
-         stop.tv_nsec -= 1000000000;
+         // unlock here for txRec
+         lgPthTxUnlock();
+         // sleep until next edge
+         while (clock_nanosleep(
+            CLOCK_MONOTONIC, TIMER_ABSTIME, &pthTxReq, NULL));
       }
-      do
-      {
-         clock_gettime(CLOCK_MONOTONIC, &now);
-      }
-      while ((now.tv_sec == stop.tv_sec && now.tv_nsec < stop.tv_nsec) ||
-             (now.tv_sec < stop.tv_sec));
-#endif
    }
 
    pthTxRunning = LG_THREAD_NONE;
@@ -305,13 +280,7 @@ lgTxRec_p lgGpioCreateTxRec(
       cyc = usec / ct;
       frac = usec - (ct *cyc);
       left = ct - frac + pthTxDelayMicros + micros_offset;
-#if SLEEP_MODE == 0
       p->next_micros = left;
-#elif SLEEP_MODE == 1
-      p->next_micros = ct - frac + pthTxDelayMicros;
-#elif SLEEP_MODE == 2
-      p->next_micros = left;
-#endif
       p->prev = NULL;
       p->next = txRec;
       if (txRec) txRec->prev = p;
