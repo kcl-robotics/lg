@@ -34,7 +34,7 @@ For more information, please refer to <http://unlicense.org/>
 // set SLEEP_MODE to 0 for the original pulse control with absolute sleep
 //                   1 for the modified pulse control with relative sleep (offset ignored)
 //                   2 for the modified pulse control with relative busy delay
-#define SLEEP_MODE   2
+#define SLEEP_MODE   1
 
 int lgMinTxDelay = 10;
 
