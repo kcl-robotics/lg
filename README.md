@@ -16,9 +16,8 @@ A few packages are needed during installation of the Python modules.
 
 On Debian like systems these packages may be installed with the following commands.
 
-- `sudo apt install swig python3-dev`
-- `sudo apt install python3-setuptools`
-- `echo "alias makelg='cd ~/lg; make; sudo make install; cp /usr/local/lib/python3.11/dist-packages/lgpio-0.2.2.0-py3.11-linux-aarch64.egg/_lgpio.cpython-311-aarch64-linux-gnu.so /home/user/ODI-MLC/venv/lib/python3.11/site-packages; cd ~/ODI-MLC'" >> ~/.bashrc`
+- `sudo apt install swig python3-dev install python3-setuptools`
+- `echo "alias makelg='cd ~/lg; make; sudo make install PYTHON=/home/user/ODI-MLC/venv/bin/python; cd ~/ODI-MLC'" >> ~/.bashrc`
 
 
 ### Download & Install
