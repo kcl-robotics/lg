@@ -1128,7 +1128,7 @@ int lgGpioClaimAlert(
 
                chip->LineInf[gpio].offsets_p = offsets_p;
 
-               values_p = calloc(1, sizeof(values_p));
+               values_p = calloc(1, sizeof(uint64_t));
 
                if (values_p == NULL)
                {
