@@ -16,14 +16,15 @@ A few packages are needed during installation of the Python modules.
 
 On Debian like systems these packages may be installed with the following commands.
 
-- `sudo apt install swig python3-dev install python3-setuptools`
-- `echo "alias makelg='cd ~/lg; make; sudo make install PYTHON=/home/user/ODI-MLC/venv/bin/python; cd ~/ODI-MLC'" >> ~/.bashrc`
+- `sudo apt install swig python3-dev python3-setuptools`
 
+### Download & Install (on MLC's Python executable)
 
-### Download & Install
-
+- `cd`
 - `git clone git@github.com:kcl-robotics/lg.git`
-- `makelg`
+- `cd ~/lg`
+- `make`
+- `sudo make install PYTHON=/home/user/ODI-MLC/venv/bin/python`
 
 ## GPIO
 
