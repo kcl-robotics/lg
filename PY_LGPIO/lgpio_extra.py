@@ -5,7 +5,7 @@ import sys
 import threading
 import time
 
-LGPIO_PY_VERSION = 0x00020200
+LGPIO_PY_VERSION = 0x010200
 
 exceptions = True
 
@@ -375,17 +375,15 @@ class _callback:
 def get_module_version():
    """
    Returns the version number of the lgpio Python module as a dotted
-   quad.
+   quad. Modified for MLC software.
 
-   A.B.C.D
+   A.B.C
    
    A. API major version, changed if breaks previous API 
    B. API minor version, changed when new function added 
    C. bug fix 
-   D. documentation change
    """
-   return "lgpio.py_{}.{}.{}.{}".format(
-      (LGPIO_PY_VERSION>>24)&0xff, (LGPIO_PY_VERSION>>16)&0xff,
+   return "lgpio.py_{}.{}.{}".format((LGPIO_PY_VERSION>>16)&0xff,
       (LGPIO_PY_VERSION>>8)&0xff, LGPIO_PY_VERSION&0xff)
 
 # GPIO

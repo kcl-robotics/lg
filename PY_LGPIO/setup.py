@@ -48,7 +48,7 @@ else:
     )
 
 setup (name = 'lgpio',
-       version = '0.2.3.0',
+       version = '1.2.0',
        zip_safe=False,
        author='joan',
        author_email='joan@abyz.me.uk',
